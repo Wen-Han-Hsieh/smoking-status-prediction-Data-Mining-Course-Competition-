@@ -1,27 +1,31 @@
-# Archived Course Materials
+# Original Course Materials
 
-This directory preserves the original implementation and experiment records
-from the data mining course competition.
+This directory preserves the original implementation developed during the
+data mining course competition.
 
 ## Files
 
+### `original_colab_notebook.ipynb`
+
+The original Google Colab notebook containing:
+
+- Exploratory data analysis
+- Feature engineering
+- Numerical and categorical preprocessing
+- XGBoost hyperparameter optimization
+- LightGBM and CatBoost experiments
+- SHAP-based feature analysis
+- ROC-AUC evaluation
+- Submission generation
+
+The notebook preserves the original development process, including repeated
+cells, intermediate experiments, execution errors, and Google Colab-specific
+paths. It is provided as an experiment record rather than a production-ready
+pipeline.
+
 ### `original_submission.py`
 
-The script corresponding most closely to the final XGBoost submission. It
-contains the main feature-engineering, preprocessing, cross-validation, and
-Bayesian hyperparameter-optimization workflow.
+The script corresponding most closely to the final XGBoost submission.
 
-### `original_colab_export.py`
-
-A raw Python export of the original Google Colab notebook. It contains
-exploratory analysis, repeated notebook cells, SHAP analysis, multiple model
-experiments, and environment-specific Google Drive paths.
-
-This file is retained as an experiment record and is not intended to be
-executed as a clean standalone script.
-
-### `original_colab_execution.pdf`
-
-A PDF export of the original Colab execution history, including selected
-outputs, figures, intermediate experiments, and error messages.
-``
+It contains the main feature-engineering, five-fold stratified
+cross-validation, and Bayesian hyperparameter-optimization workflow.
