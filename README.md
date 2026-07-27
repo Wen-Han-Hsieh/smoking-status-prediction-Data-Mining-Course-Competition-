@@ -1,69 +1,73 @@
-# Smoking Status Prediction (Data Mining Course Competition)
+# Smoking Status Prediction
 
-An XGBoost-based binary classification project for predicting smoking status
-from health examination and bio-signal data.
+Predicting smoking status from health examination and bio-signal data using
+gradient-boosted decision trees.
 
-This project was developed for an individual data mining course competition
-restricted to logistic-regression-based and decision-tree-based models.
-Submissions were evaluated using ROC-AUC.
+This project was developed for an individual data mining course competition.
+The competition restricted model selection to logistic-regression-based and
+decision-tree-based methods and used ROC-AUC as the evaluation metric.
 
 ## Results
 
+- **Private leaderboard ROC-AUC:** 0.8857
 - **Private leaderboard rank:** 25 / 84 individual participants
 - **Percentile:** Top 30%
-- **Final model:** XGBoost
-- **Validation:** 5-fold Stratified Cross-Validation
-- **Hyperparameter tuning:** Bayesian Optimization with 70 search iterations
-- **ROC-AUC:** 0.8857 *(score source to be labeled as CV, public, or private)*
+- **Final submitted model:** XGBoost
+- **Local validation:** 5-fold Stratified Cross-Validation
+- **Hyperparameter optimization:** BayesSearchCV with 70 search iterations
 
-## Dataset
+## Problem Description
 
-The task is to predict the binary target `smoking` from health examination
-features, including:
+The objective was to predict the binary target `smoking` using health
+examination features, including:
 
 - Age and body measurements
 - Eyesight and hearing
 - Blood pressure
 - Blood sugar and lipid indicators
-- Hemoglobin and kidney-function indicators
-- AST, ALT, and GTP
+- Hemoglobin and serum creatinine
 - Urine protein
+- AST, ALT, and GTP
 - Dental caries
 
-Competition data are not redistributed in this repository.
+The final submission contained the predicted probability of the positive
+smoking class for each test-set ID.
 
-## Feature Engineering
+## Methodology
+
+### Feature Engineering
 
 The original solution included:
 
-- Replacing eyesight values greater than 9 with 0.0 as a special-value treatment
-- Reorganizing left and right eyesight measurements using their minimum and maximum
-- Reorganizing left and right hearing measurements using their minimum and maximum
+- Reorganizing bilateral eyesight and hearing measurements
 - Creating BMI from height and weight
 - Creating a systolic-to-diastolic blood-pressure ratio
 - Creating an ALT-to-AST liver-function ratio
 - Creating an LDL-to-HDL cholesterol ratio
-- Applying `log1p` to non-negative numerical features with skewness greater than 1
-- Applying `RobustScaler` to numerical features
-- Applying one-hot encoding to hearing and dental-caries features
-- Applying integer encoding to urine-protein levels
 - Adding frequency encoding for age groups
-- Removing one feature from highly correlated pairs using an absolute correlation
-  threshold of 0.8
+- Applying `log1p` transformation to right-skewed numerical features
+- Applying categorical encoding and numerical scaling
+- Filtering highly correlated features
 
-## Model Training
+The log-transformed features in the archived experiment included:
 
-The final estimator was `XGBClassifier`.
+- Fasting blood sugar
+- Triglyceride
+- AST
+- ALT
+- GTP
+- ALT-to-AST ratio
 
-Hyperparameters were optimized using `BayesSearchCV` with:
+### Model Training
+
+The final XGBoost model was tuned using:
 
 - 5-fold `StratifiedKFold`
-- 70 Bayesian search iterations
 - ROC-AUC scoring
-- Parallel execution with `n_jobs=-1`
-- Fixed random seed of 42
+- 70 Bayesian search iterations
+- A fixed random seed of 42
 
-The search space included:
+The hyperparameter search included:
 
 - `learning_rate`
 - `n_estimators`
@@ -76,47 +80,85 @@ The search space included:
 - `reg_lambda`
 - `scale_pos_weight`
 
-## Model and Feature Comparisons
+### SHAP Analysis
 
-The original project report compared:
+SHAP TreeExplainer was used to rank features by mean absolute SHAP values.
 
-- XGBoost and LightGBM
-- All features
-- Top 15 SHAP-ranked features
-- An automatically selected SHAP-based feature subset
+The original experiments considered:
 
-The archived Python script contains the final XGBoost workflow.
-The LightGBM and SHAP experiments will be added after the original experimental
-notebooks are recovered or reproduced.
+- All available features
+- SHAP-ranked feature subsets
+- A SHAP top-15 feature subset
+- XGBoost
+- LightGBM
+- CatBoost
+- A soft-voting ensemble
 
-## Validation Notes
+The final submitted solution used XGBoost rather than the experimental
+ensemble.
 
-The archived course solution performs numerical scaling, frequency encoding,
-and correlation-based feature filtering before cross-validation.
+## Repository Structure
 
-Although these transformations do not directly use the target label, fitting
-them on the complete training set allows validation-fold distribution
-information to influence preprocessing.
+```text
+smoking-status-prediction/
+├── README.md
+├── requirements.txt
+├── archive/
+│   ├── README.md
+│   ├── original_submission.py
+│   ├── original_colab_export.py
+│   └── original_colab_execution.pdf
+├── reports/
+│   └── course_report.pdf
+└── data/
+    └── README.md
+```
 
-The refactored version of this project will move all stateful preprocessing
-inside the cross-validation pipeline.
+## Archived Materials
 
-## Repository Status
+The `archive/` directory preserves the original course submission and Colab
+experiments.
 
-This repository distinguishes between:
+These files contain exploratory code, repeated notebook cells,
+environment-specific paths, and intermediate model experiments. They are
+retained to document the original development process and are not presented as
+a production-ready pipeline.
 
-- `archive/`: the original course submission
-- `src/`: the refactored, reproducible implementation
-- `notebooks/`: exploratory analysis, model comparison, and SHAP analysis
-- `reports/`: cross-validation results and figures
+## Dataset Availability
+
+The competition dataset is not redistributed in this repository.
+
+See data/README.md for the expected local data structure.
+
+## Current Status
+
+This repository currently preserves and documents the original competition
+work.
+
+Future improvements may include:
+
+- Separating EDA, feature engineering, training, and prediction
+- Replacing Google Drive paths with project-relative paths
+- Creating a reproducible preprocessing and training pipeline
+- Reproducing SHAP analysis in a clean notebook
+- Recording local cross-validation results
+- Adding submission-file validation
 
 ## Limitations
 
-- The original preprocessing workflow was not fully isolated within each
-  cross-validation fold.
-- The benefit of scaling and correlation filtering for XGBoost requires
-  ablation testing.
-- SHAP values describe model behavior rather than causal relationships.
+- The archived code was developed in Google Colab and contains
+  environment-specific paths.
+- The raw Colab export contains multiple experimental versions and is not
+  intended to run as one production script.
+- Some preprocessing steps were performed before cross-validation.
+- SHAP feature importance describes model behavior and does not establish
+  causal relationships.
 - Competition performance does not establish clinical validity.
-- This project is for educational purposes and should not be used for medical
-  diagnosis.
+
+This project is intended for educational and portfolio purposes and should not
+be used for medical diagnosis.
+
+## License
+
+The competition dataset remains subject to the terms of its original provider
+and is not redistributed in this repository.
